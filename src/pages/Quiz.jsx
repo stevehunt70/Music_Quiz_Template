@@ -8,11 +8,19 @@ import { shuffleArray } from '../lib/quizStorage';
 import q1950s from '../data/questions1950s.json';
 import q1960s from '../data/questions1960s.json';
 import q1970s from '../data/questions1970s.json';
+import q1980s from '../data/questions1980s.json';
+import q1990s from '../data/questions1990s.json';
+import q2000s from '../data/questions2000s.json';
+import q2010s from '../data/questions2010s.json';
 
 const allQuestions = {
   '1950s': q1950s,
   '1960s': q1960s,
   '1970s': q1970s,
+  '1980s': q1980s,
+  '1990s': q1990s,
+  '2000s': q2000s,
+  '2010s': q2010s
 };
 
 export default function Quiz() {

@@ -7,6 +7,10 @@ const decades = [
   { key: '1950s', label: '1950s', emoji: '🎷' },
   { key: '1960s', label: '1960s', emoji: '🌸' },
   { key: '1970s', label: '1970s', emoji: '🕺' },
+  { key: '1980s', label: '1980s', emoji: '🎸' },
+  { key: '1990s', label: '1990s', emoji: '🎸' },
+  { key: '2000s', label: '2000s', emoji: '🕺' },
+  { key: '2010s', label: '2010s', emoji: '🕺' },
 ];
 
 export default function Home() {
