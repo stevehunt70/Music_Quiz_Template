@@ -8,7 +8,8 @@ const difficultyConfig = {
     badge: 'bg-emerald-500/20 text-emerald-300',
     glow: 'hover:shadow-emerald-500/20',
     icon: '🎵',
-    description: 'Perfect for beginners',
+    title: 'Easy',
+    description: 'Highest position was in the top 20',
   },
   medium: {
     gradient: 'from-amber-500/20 to-amber-600/5',
@@ -16,7 +17,8 @@ const difficultyConfig = {
     badge: 'bg-amber-500/20 text-amber-300',
     glow: 'hover:shadow-amber-500/20',
     icon: '🎸',
-    description: 'Test your knowledge',
+    title: 'Medium',
+    description: 'Positioned between 21 - 50',
   },
   hard: {
     gradient: 'from-rose-500/20 to-rose-600/5',
@@ -24,7 +26,8 @@ const difficultyConfig = {
     badge: 'bg-rose-500/20 text-rose-300',
     glow: 'hover:shadow-rose-500/20',
     icon: '🎼',
-    description: 'For true music experts',
+    title: 'Hard',
+    description: 'Positioned between 51 - 75',
   },
 };
 
@@ -42,18 +45,18 @@ export default function DifficultyCard({ difficulty, highScore, totalQuestions, 
       className={`w-full p-6 rounded-2xl border bg-gradient-to-br ${config.gradient} ${config.border} ${config.glow} hover:shadow-xl transition-all duration-300 text-left group`}
     >
       <div className="flex items-start justify-between mb-4">
-        <span className="text-3xl">{config.icon}</span>
+        <span className="text-1xl">{config.icon} {totalQuestions} questions</span>
         <span className={`text-xs font-semibold px-3 py-1 rounded-full ${config.badge} font-heading uppercase tracking-wider`}>
           {difficulty}
         </span>
       </div>
-      <p className="text-muted-foreground text-sm mb-4">{config.description}</p>
+      
       <div className="flex items-center justify-between">
         <span className="text-xs text-muted-foreground">{config.description}</span>
         <div className="flex items-center gap-1.5">
           <Trophy className="w-3.5 h-3.5 text-amber-400" />
           <span className="text-sm font-heading font-semibold text-foreground">{highScore}</span>
-        </div>
+        </div>        
       </div>
     </motion.button>
   );

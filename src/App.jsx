@@ -9,6 +9,9 @@ import Home from './pages/Home';
 import Difficulty from './pages/Difficulty';
 import Quiz from './pages/Quiz';
 import Results from './pages/Results';
+import HowToPlay from './pages/HowToPlay';
+import About from './pages/About';
+import HighScores from './pages/HighScores';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -40,6 +43,9 @@ const AuthenticatedApp = () => {
       <Route path="/difficulty" element={<Difficulty />} />
       <Route path="/quiz" element={<Quiz />} />
       <Route path="/results" element={<Results />} />
+      <Route path="/how-to-play" element={<HowToPlay />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/high-scores" element={<HighScores />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
