@@ -1,144 +1,133 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import QuizHeader from '../components/quiz/QuizHeader';
-import AnswerButton from '../components/quiz/AnswerButton';
-import { shuffleArray } from '../lib/quizStorage';
-
-import q1950s from '../data/questions1950s.json';
-import q1960s from '../data/questions1960s.json';
-import q1970s from '../data/questions1970s.json';
-import q1980s from '../data/questions1980s.json';
-import q1990s from '../data/questions1990s.json';
-import q2000s from '../data/questions2000s.json';
-import q2010s from '../data/questions2010s.json';
-
-const allQuestions = {
-  '1950s': q1950s,
-  '1960s': q1960s,
-  '1970s': q1970s,
-  '1980s': q1980s,
-  '1990s': q1990s,
-  '2000s': q2000s,
-  '2010s': q2010s
-};
+// src/pages/Quiz.jsx
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import QuizHeader from "@/components/quiz/QuizHeader";
+import AnswerButton from "@/components/quiz/AnswerButton";
+import { generateQuestion, buildMultipleChoice } from "@/lib/questionGenerator";
+import { shuffleArray } from "@/lib/shuffleArray";
 
 export default function Quiz() {
+  const location = useLocation();
   const navigate = useNavigate();
-  const urlParams = new URLSearchParams(window.location.search);
-  const decade = urlParams.get('decade') || '1980s';
-  const difficulty = urlParams.get('difficulty') || 'easy';
+
+  const { decade, difficulty, questionCount, showCorrectOnWrong } = location.state || {};
 
   const [questions, setQuestions] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [current, setCurrent] = useState(0);
   const [score, setScore] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const decadeSet = allQuestions[decade];
-    if (!decadeSet) {
-      navigate('/');
-      return;
-    }
-    // Filter by difficulty
-    const filtered = decadeSet.filter(
-      q => q.difficulty?.toLowerCase() === difficulty.toLowerCase()
-    );
-    if (filtered.length === 0) {
-      navigate(`/difficulty?decade=${decade}`);
-      return;
-    }
-    // Shuffle questions AND shuffle each question's answers
-    const shuffled = shuffleArray(filtered).map(q => {
-      const indexed = q.answers.map((a, i) => ({ text: a, isCorrect: i === q.correct }));
-      const shuffledAnswers = shuffleArray(indexed);
-      return {
-        ...q,
-        answers: shuffledAnswers.map(a => a.text),
-        correct: shuffledAnswers.findIndex(a => a.isCorrect),
-      };
-    });
-    setQuestions(shuffled);
-  }, [decade, difficulty, navigate]);
+    async function loadData() {
+      try {
+        setLoading(true);
 
-  const currentQuestion = questions[currentIndex];
-  const totalQuestions = questions.length;
+        const data = await import(`../data/songs${decade}.json`);
+        const dataset = data.default;
 
-  const finishQuiz = useCallback((finalScore, finalIndex) => {
-    navigate(`/results?decade=${decade}&difficulty=${difficulty}&score=${finalScore}&total=${finalIndex}&questions=${totalQuestions}`);
-  }, [navigate, decade, difficulty, totalQuestions]);
+        const filtered = dataset.filter(
+          (e) => e.difficulty_level <= Number(difficulty)
+        );
 
-  const handleAnswer = (answerIndex) => {
-    if (selectedAnswer !== null) return;
-    setSelectedAnswer(answerIndex);
+        const selected = shuffleArray(filtered).slice(0, questionCount);
 
-    const isCorrect = answerIndex === currentQuestion.correct;
-    const newScore = isCorrect ? score + 1 : score;
-    if (isCorrect) setScore(newScore);
+        const generatedQuestions = selected
+          .map((entry) => {
+            const q = generateQuestion(entry);
+            return buildMultipleChoice(entry, dataset, q);
+          })
+          .filter(Boolean);
 
-    setTimeout(() => {
-      if (currentIndex + 1 >= totalQuestions) {
-        finishQuiz(newScore, currentIndex + 1);
-      } else {
-        setCurrentIndex((prev) => prev + 1);
-        setSelectedAnswer(null);
+        setQuestions(generatedQuestions);
+      } catch (err) {
+        console.error("Quiz generation error:", err);
+      } finally {
+        setLoading(false);
       }
-    }, 1200);
-  };
+    }
 
-  const handleStop = () => {
-    finishQuiz(score, currentIndex);
-  };
+    loadData();
+  }, [decade, difficulty, questionCount]);
 
-  if (!currentQuestion) {
+  if (loading || questions.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center text-muted-foreground">
+        Loading…
       </div>
     );
   }
 
+  const currentQ = questions[current];
+
+  function handleSelect(index) {
+    if (selectedIndex !== null) return;
+
+    setSelectedIndex(index);
+
+    if (index === currentQ.correctIndex) {
+      setScore((prev) => prev + 1);
+    }
+
+    setTimeout(() => {
+      if (current < questions.length - 1) {
+        setCurrent((prev) => prev + 1);
+        setSelectedIndex(null);
+      } else {
+        navigate("/results", {
+          state: {
+            score,
+            total: questions.length,
+            decade,
+            difficulty,
+            questionCount
+          }
+        });
+      }
+    }, 900);
+  }
+
+  function handleStop() {
+    navigate("/results", {
+      state: {
+        score,
+        total: questions.length,
+        decade,
+        difficulty,
+        questionCount
+      }
+    });
+  }
+
   return (
-    <div className="min-h-screen flex flex-col px-5 py-6 max-w-lg mx-auto">
+    <div className="min-h-screen px-5 py-8 max-w-xl mx-auto space-y-8">
       <QuizHeader
-        questionNumber={currentIndex + 1}
-        totalQuestions={totalQuestions}
+        questionNumber={current + 1}
+        totalQuestions={questions.length}
         score={score}
-        difficulty={`${decade} • ${difficulty}`}
+        difficulty={`Level ${difficulty}`}
         onStop={handleStop}
       />
 
-      <div className="flex-1 flex flex-col justify-center py-8">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentIndex}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-6"
-          >
-            <div className="space-y-2">
-              <h2 className="text-xl sm:text-2xl font-heading font-bold leading-snug">
-                {currentQuestion.question}
-              </h2>
-            </div>
+      <div className="text-center space-y-4">
+        <h2 className="text-xl font-heading font-bold leading-snug">
+          {currentQ.question}
+        </h2>
+      </div>
 
-            <div className="space-y-3">
-              {currentQuestion.answers.map((answer, i) => (
-                <AnswerButton
-                  key={`${currentIndex}-${i}`}
-                  answer={answer}
-                  index={i}
-                  onSelect={handleAnswer}
-                  selectedIndex={selectedAnswer}
-                  correctIndex={currentQuestion.correct}
-                  disabled={selectedAnswer !== null}
-                />
-              ))}
-            </div>
-          </motion.div>
-        </AnimatePresence>
+      <div className="space-y-3 mt-6">
+        {currentQ.answers.map((answer, i) => (
+          <AnswerButton
+            key={i}
+            answer={answer}
+            index={i}
+            onSelect={handleSelect}
+            selectedIndex={selectedIndex}
+            correctIndex={currentQ.correctIndex}
+            disabled={selectedIndex !== null}
+            showCorrectOnWrong={showCorrectOnWrong}
+          />
+        ))}
       </div>
     </div>
   );

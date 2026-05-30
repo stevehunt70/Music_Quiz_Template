@@ -23,10 +23,7 @@ export default function About() {
         </button>
 
         <div className="text-center mb-8">
-          <img            
-            src={logoFull} className="mx-auto w-50 h-20 mb-2"
-            alt="Sound and Vinyl Logo"
-          />
+          
           <h1 className="text-3xl font-heading font-bold tracking-tight mb-2">About</h1>
           <p className="text-muted-foreground text-sm">UK Chart Music Quiz</p>
         </div>
@@ -36,6 +33,7 @@ export default function About() {
             <p className="font-heading font-semibold text-foreground text-sm mb-1">What is this?</p>
             <p className="text-muted-foreground text-xs leading-relaxed">
               A music trivia game focused on the UK singles chart. Test your knowledge of the hits that defined each decade, from the 1950s through to the 2010s.
+              There are currently over 37000 questions in the app, with more being added and other subjects to follow.
             </p>
           </div>
 
@@ -54,7 +52,7 @@ export default function About() {
           </div>
         </div>
 
-        <p className="text-center text-xs text-muted-foreground mt-8">Made with 🎵 by Infineo Solutions</p>
+        <p className="text-center text-xs text-muted-foreground mt-8">Made for 🎵 by Infineo Solutions</p>
       </motion.div>
     </div>
   );

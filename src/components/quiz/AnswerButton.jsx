@@ -4,17 +4,62 @@ import { cn } from '@/lib/utils';
 
 const labels = ['A', 'B', 'C', 'D'];
 
-export default function AnswerButton({ answer, index, onSelect, selectedIndex, correctIndex, disabled }) {
+export default function AnswerButton({
+  answer,
+  index,
+  onSelect,
+  selectedIndex,
+  correctIndex,
+  disabled,
+  showCorrectOnWrong   // NEW
+}) {
   const isSelected = selectedIndex === index;
   const isCorrect = correctIndex === index;
   const showResult = selectedIndex !== null;
 
-  let stateClass = 'border-border/50 hover:border-primary/50 hover:bg-secondary/50';
+  // -----------------------------
+  // BUTTON BORDER + BACKGROUND
+  // -----------------------------
+  let stateClass =
+    'border-border/50 hover:border-primary/50 hover:bg-secondary/50';
+
   if (showResult && isCorrect && isSelected) {
+    // User selected correct answer
     stateClass = 'border-emerald-500/70 bg-emerald-500/10';
-  } else if (showResult && isSelected && !isCorrect) {
+  } 
+  else if (showResult && isSelected && !isCorrect) {
+    // User selected wrong answer
     stateClass = 'border-rose-500/70 bg-rose-500/10';
+  } 
+  else if (showResult && isCorrect && !isSelected && showCorrectOnWrong) {
+    // Reveal correct answer (blue)
+    stateClass = 'border-blue-500/70 bg-blue-500/10';
   }
+
+  // -----------------------------
+  // ICON BOX (A/B/C/D or Check/X)
+  // -----------------------------
+  const iconClass = cn(
+    'w-9 h-9 rounded-lg flex items-center justify-center text-sm font-heading font-bold shrink-0 transition-colors',
+
+    // Correct + selected
+    showResult && isCorrect && isSelected && 'bg-emerald-500 text-white',
+
+    // Wrong + selected
+    showResult && isSelected && !isCorrect && 'bg-rose-500 text-white',
+
+    // Correct revealed (blue)
+    showResult &&
+      isCorrect &&
+      !isSelected &&
+      showCorrectOnWrong &&
+      'bg-blue-500 text-white',
+
+    // Default state
+    (!showResult || !isSelected) &&
+      !(showResult && isCorrect && !isSelected && showCorrectOnWrong) &&
+      'bg-secondary text-muted-foreground group-hover:bg-primary group-hover:text-primary-foreground'
+  );
 
   return (
     <motion.button
@@ -31,16 +76,18 @@ export default function AnswerButton({ answer, index, onSelect, selectedIndex, c
         disabled && !showResult && 'opacity-50 cursor-not-allowed'
       )}
     >
-      <div
-        className={cn(
-          'w-9 h-9 rounded-lg flex items-center justify-center text-sm font-heading font-bold shrink-0 transition-colors',
-          showResult && isCorrect && isSelected && 'bg-emerald-500 text-white',
-          showResult && isSelected && !isCorrect && 'bg-rose-500 text-white',
-          (!showResult || (!isSelected)) && 'bg-secondary text-muted-foreground group-hover:bg-primary group-hover:text-primary-foreground'
-      )}
-      >
-        {showResult && isCorrect && isSelected ? <Check className="w-4 h-4" /> : showResult && isSelected && !isCorrect ? <X className="w-4 h-4" /> : labels[index]}
+      <div className={iconClass}>
+        {showResult && isCorrect && isSelected ? (
+          <Check className="w-4 h-4" />
+        ) : showResult && isSelected && !isCorrect ? (
+          <X className="w-4 h-4" />
+        ) : showResult && isCorrect && !isSelected && showCorrectOnWrong ? (
+          <Check className="w-4 h-4" />
+        ) : (
+          labels[index]
+        )}
       </div>
+
       <span className="text-sm font-medium leading-snug">{answer}</span>
     </motion.button>
   );

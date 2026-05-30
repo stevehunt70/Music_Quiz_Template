@@ -1,34 +1,29 @@
-const STORAGE_KEY = 'music_quiz_high_scores';
+// src/lib/quizStorage.js
 
-export function getHighScores(decade) {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  const allScores = stored ? JSON.parse(stored) : {};
-  if (decade) {
-    return {
-      easy: allScores[`${decade}_easy`] || 0,
-      medium: allScores[`${decade}_medium`] || 0,
-      hard: allScores[`${decade}_hard`] || 0,
-    };
-  }
-  return allScores;
+function loadScores() {
+  return JSON.parse(localStorage.getItem("highscores") || "{}");
 }
 
-export function setHighScore(key, score) {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  const allScores = stored ? JSON.parse(stored) : {};
-  if (score > (allScores[key] || 0)) {
-    allScores[key] = score;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(allScores));
-    return true;
-  }
-  return false;
+function saveScores(scores) {
+  localStorage.setItem("highscores", JSON.stringify(scores));
 }
 
-export function shuffleArray(array) {
-  const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+export function getHighScore(decade, difficulty, questionCount) {
+  const key = `${decade}_${difficulty}_${questionCount}`;
+  const scores = loadScores();
+  return scores[key] || 0;
+}
+
+export function setHighScore(decade, difficulty, questionCount, score) {
+  const key = `${decade}_${difficulty}_${questionCount}`;
+  const scores = loadScores();
+  const previous = scores[key] || 0;
+
+  const isNew = score > previous;
+  if (isNew) {
+    scores[key] = score;
+    saveScores(scores);
   }
-  return shuffled;
+
+  return isNew;
 }

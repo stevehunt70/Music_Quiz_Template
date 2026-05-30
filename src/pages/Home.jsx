@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Music } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import DecadeCard from '../components/quiz/DecadeCard';
 import logoFull from '../assets/vinyl_logo_invert.png'; 
 
@@ -17,9 +17,29 @@ const decades = [
 export default function Home() {
   const navigate = useNavigate();
 
+  // NEW: Setting state
+  const [showCorrectOnWrong, setShowCorrectOnWrong] = useState(true);
+
+  // Load saved setting
+  useEffect(() => {
+    const saved = localStorage.getItem("showCorrectOnWrong");
+    if (saved !== null) setShowCorrectOnWrong(saved === "true");
+  }, []);
+
+  // Toggle handler
+  function toggleSetting() {
+    const newValue = !showCorrectOnWrong;
+    setShowCorrectOnWrong(newValue);
+    localStorage.setItem("showCorrectOnWrong", newValue);
+  }
+
   const handleSelect = (decade) => {
-    navigate(`/difficulty?decade=${decade}`);
-  };
+  navigate("/difficulty", {
+    state: { decade,
+            showCorrectOnWrong   // NEW: pass setting forward
+    },  
+  });
+};
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-5 py-12">
@@ -38,6 +58,25 @@ export default function Home() {
         <p className="text-muted-foreground text-sm max-w-xs mx-auto">
           Test your knowledge of the UK charts. Choose your decade to begin.
         </p>
+        {/* NEW: Toggle Switch */}
+        <div className="flex items-center justify-center gap-3 mt-6">
+          <span className="text-xs text-muted-foreground">
+            Show Correct Answer When Wrong
+          </span>
+
+          <button
+            onClick={toggleSetting}
+            className={`w-12 h-6 rounded-full transition relative ${
+              showCorrectOnWrong ? "bg-primary" : "bg-muted"
+            }`}
+          >
+            <div
+              className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition ${
+                showCorrectOnWrong ? "left-6" : "left-0.5"
+              }`}
+            />
+          </button>
+        </div>
       </motion.div>
 
       <div className="w-full max-w-sm space-y-3">
@@ -60,7 +99,7 @@ export default function Home() {
         className="flex gap-5 mt-3"
       >
         <button
-          onClick={() => navigate('/high-scores')}
+          onClick={() => navigate('/highscores')}
           className="text-xs text-muted-foreground hover:text-foreground transition-colors"
         >
           High Scores
@@ -86,9 +125,7 @@ export default function Home() {
         className="text-xs text-muted-foreground mt-3"
       >
         No internet required • No ads
-      </motion.p>
-
-      
+      </motion.p>      
     </div>
   );
 }
