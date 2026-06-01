@@ -2,11 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Star, TrendingUp, Music, Disc3, Flame, Trophy } from "lucide-react";
 import { getHighScore } from "@/lib/quizStorage";
-import logoFull from '../assets/vinyl_logo_invert.png'; 
+import { getDropdownDecades } from "@/lib/purchases";
+import logoFull from "../assets/vinyl_logo_invert.png";
 
-const decades = ["1950s","1960s","1970s","1980s","1990s","2000s","2010s"];
-const questionCounts = [5,10,15,20,25,30];
-const difficulties = [1,2,3,4,5];
+const questionCounts = [5, 10, 15, 20, 25, 30];
+const difficulties = [1, 2, 3, 4, 5];
 
 const difficultyConfig = {
   1: {
@@ -41,89 +41,124 @@ const difficultyConfig = {
   },
 };
 
+function formatDecadeLabel(decade) {
+  if (decade === "free") return "Free Pack";
+  if (decade === "all") return "All Decades";
+  return decade;
+}
+
 export default function HighScores() {
-  const [decade, setDecade] = useState("1980s");
-  const [questionCount, setQuestionCount] = useState(10);
   const navigate = useNavigate();
+
+  // Only Free + Purchased + All (if unlocked)
+  const decades = getDropdownDecades();
+
+  // Default to first available decade
+  const [decade, setDecade] = useState(decades[0]);
 
   return (
     <div className="min-h-screen px-5 py-10 max-w-xl mx-auto space-y-8">
+
+      {/* HEADER */}
       <div className="flex justify-center">
         <div className="flex items-center gap-4">
-            <img src={logoFull} className="h-20 w-auto" />
-            <h1 className="text-3xl font-heading font-bold leading-none">High Scores</h1>
+          <img src={logoFull} className="h-20 w-auto" />
+          <h1 className="text-3xl font-heading font-bold leading-none">
+            High Scores
+          </h1>
         </div>
       </div>
-      {/* DROPDOWNS */}
-      <div className="grid grid-cols-2 gap-4 w-full max-w-md mx-auto">
-        {/* Decade */}
-        <div>
-          <label className="text-xs text-muted-foreground">Decade</label>
-          <select
-            value={decade}
-            onChange={(e) => setDecade(e.target.value)}
-            className="w-full p-3 rounded-xl border bg-card"
-          >
-            {decades.map(d => <option key={d}>{d}</option>)}
-          </select>
-        </div>
-        {/* Question Count */}
-        <div>
-          <label className="text-xs text-muted-foreground">Questions</label>
-          <select
-            value={questionCount}
-            onChange={(e) => setQuestionCount(Number(e.target.value))}
-            className="w-full p-3 rounded-xl border bg-card"
-          >
-            {questionCounts.map(n => <option key={n} value={n}>{n}</option>)}
-          </select>
-        </div>
+
+      {/* DROPDOWN */}
+      <div className="w-full max-w-md mx-auto">
+        <label className="text-xs text-muted-foreground">Decade</label>
+        <select
+          value={decade}
+          onChange={(e) => setDecade(e.target.value)}
+          className="w-full p-3 rounded-xl border bg-card"
+        >
+          {decades.map((d) => (
+            <option key={d} value={d}>
+              {formatDecadeLabel(d)}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* HIGH SCORE CARD */}
       <div className="rounded-xl border border-border/50 bg-card overflow-hidden">
+
         {/* Header */}
         <div className="px-4 py-3 border-b border-border/40">
           <p className="font-heading font-bold text-foreground text-lg">
-            {decade} — {questionCount} Questions
+            {formatDecadeLabel(decade)} — All Question Counts
           </p>
         </div>
-        {/* Difficulty rows */}
+
+        {/* Difficulty Rows */}
         <div className="divide-y divide-border/30">
           {difficulties.map((diff) => {
-          const score = getHighScore(decade, diff, questionCount);
-          const cfg = difficultyConfig[diff];
-          const Icon = cfg.icon;
+            const cfg = difficultyConfig[diff];
+            const Icon = cfg.icon;
 
-          return (
-            <div
-              key={diff}
-              className="flex items-center justify-between px-4 py-3"
-            >
-              <div className="flex items-center gap-3">
-                <Icon className={`w-5 h-5 ${cfg.color}`} />
+            return (
+              <div key={diff} className="px-4 py-4 space-y-3">
 
-                <div className="flex flex-col">
-                  <span className={`text-sm font-heading font-semibold ${cfg.color}`}>
-                    {cfg.title}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {cfg.description}
-                  </span>
+                {/* Difficulty Header */}
+                <div className="flex items-center gap-3">
+                  <Icon className={`w-5 h-5 ${cfg.color}`} />
+
+                  <div className="flex flex-col">
+                    <span
+                      className={`text-sm font-heading font-semibold ${cfg.color}`}
+                    >
+                      {cfg.title}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {cfg.description}
+                    </span>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex items-center gap-1.5">
-                <Trophy className={`w-4 h-4 ${cfg.color}`} />
-                <span className="text-sm font-heading font-bold text-foreground">
-                  {score}
-                </span>
+                {/* Mini Table */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="text-muted-foreground text-xs">
+                        {questionCounts.map((qc) => (
+                          <th key={qc} className="px-2 py-1 text-center">
+                            {qc}Q
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        {questionCounts.map((qc) => {
+                          const score =
+                            getHighScore(decade, diff, qc) || 0;
+
+                          return (
+                            <td
+                              key={qc}
+                              className="px-2 py-1 text-center font-heading font-bold"
+                            >
+                              {score}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
         </div>
       </div>
+
+      {/* BACK BUTTON */}
       <div className="flex flex-col w-full mx-auto">
         <button
           onClick={() => navigate("/")}
@@ -133,6 +168,5 @@ export default function HighScores() {
         </button>
       </div>
     </div>
-    
   );
 }

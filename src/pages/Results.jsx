@@ -10,7 +10,7 @@ export default function Results() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { score, total, decade, difficulty, questionCount } = location.state || {};
+  const { score, decade, difficulty, questionCount } = location.state || {};
 
   const [prevHighScore, setPrevHighScore] = useState(0);
   const [isNewHighScore, setIsNewHighScore] = useState(false);

@@ -19,36 +19,52 @@ export default function Quiz() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        setLoading(true);
+  async function loadData() {
+    try {
+      setLoading(true);
 
-        const data = await import(`../data/songs${decade}.json`);
-        const dataset = data.default;
+      let dataset = [];
 
-        const filtered = dataset.filter(
-          (e) => e.difficulty_level <= Number(difficulty)
-        );
-
-        const selected = shuffleArray(filtered).slice(0, questionCount);
-
-        const generatedQuestions = selected
-          .map((entry) => {
-            const q = generateQuestion(entry);
-            return buildMultipleChoice(entry, dataset, q);
-          })
-          .filter(Boolean);
-
-        setQuestions(generatedQuestions);
-      } catch (err) {
-        console.error("Quiz generation error:", err);
-      } finally {
-        setLoading(false);
+      // ALL DECADES MODE
+      if (decade === "all") {
+        const packs = getPurchasedDecades(); // ["free","1970s","1980s"]
+        for (const p of packs) {
+          const data = await import(`../data/songs${p}.json`);
+          dataset = dataset.concat(data.default);
+        }
       }
-    }
 
-    loadData();
-  }, [decade, difficulty, questionCount]);
+      // SINGLE PACK MODE
+      else {
+        const data = await import(`../data/songs${decade}.json`);
+        dataset = data.default;
+      }
+
+      // FILTER BY DIFFICULTY
+      const filtered = dataset.filter(
+        (e) => e.difficulty_level <= Number(difficulty)
+      );
+
+      // PICK QUESTIONS
+      const selected = shuffleArray(filtered).slice(0, questionCount);
+
+      const generated = selected
+        .map((entry) => {
+          const q = generateQuestion(entry, dataset);
+          return buildMultipleChoice(entry, dataset, q);
+        })
+        .filter(Boolean);
+
+      setQuestions(generated);
+    } catch (err) {
+      console.error("Quiz generation error:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  loadData();
+}, [decade, difficulty, questionCount]);
 
   if (loading || questions.length === 0) {
     return (
