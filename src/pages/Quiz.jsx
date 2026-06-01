@@ -61,43 +61,51 @@ export default function Quiz() {
   const currentQ = questions[current];
 
   function handleSelect(index) {
-    if (selectedIndex !== null) return;
+  if (selectedIndex !== null) return;
 
-    setSelectedIndex(index);
+  setSelectedIndex(index);
 
-    if (index === currentQ.correctIndex) {
-      setScore((prev) => prev + 1);
-    }
-
-    setTimeout(() => {
-      if (current < questions.length - 1) {
-        setCurrent((prev) => prev + 1);
-        setSelectedIndex(null);
-      } else {
-        navigate("/results", {
-          state: {
-            score,
-            total: questions.length,
-            decade,
-            difficulty,
-            questionCount
-          }
-        });
-      }
-    }, 900);
+  const isCorrect = index === currentQ.correctIndex;
+  if (isCorrect) {
+    setScore((prev) => prev + 1);
   }
+
+  setTimeout(() => {
+    if (current < questions.length - 1) {
+      setCurrent((prev) => prev + 1);
+      setSelectedIndex(null);
+    } else {
+      const finalScore = isCorrect ? score + 1 : score;
+
+      navigate("/results", {
+        state: {
+          score: finalScore,
+          total: questions.length,
+          decade,
+          difficulty,
+          questionCount
+        }
+      });
+    }
+  }, 900);
+}
 
   function handleStop() {
-    navigate("/results", {
-      state: {
-        score,
-        total: questions.length,
-        decade,
-        difficulty,
-        questionCount
-      }
-    });
-  }
+  // If the user has selected an answer on this question,
+  // and React hasn't updated score yet, fix it.
+  const isCorrect = selectedIndex === currentQ.correctIndex;
+  const finalScore = isCorrect ? score + 1 : score;
+
+  navigate("/results", {
+    state: {
+      score: finalScore,
+      total: questions.length,
+      decade,
+      difficulty,
+      questionCount
+    }
+  });
+}
 
   return (
     <div className="min-h-screen px-5 py-8 max-w-xl mx-auto space-y-8">
