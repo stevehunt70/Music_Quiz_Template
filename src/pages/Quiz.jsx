@@ -126,7 +126,7 @@ export default function Quiz() {
       <div className="space-y-3 mt-6">
         {currentQ.answers.map((answer, i) => (
           <AnswerButton
-            key={i}
+            key={`${current}-${i}`}
             answer={answer}
             index={i}
             onSelect={handleSelect}
