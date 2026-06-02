@@ -125,11 +125,16 @@ export default function HighScores() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="text-muted-foreground text-xs">
-                        {questionCounts.map((qc) => (
-                          <th key={qc} className="px-2 py-1 text-center">
-                            {qc}Q
-                          </th>
-                        ))}
+                        {questionCounts.map((qc) => {
+                          const score = getHighScore(decade, String(diff), String(qc)) || 0;
+
+                          return (
+                            <td key={qc} className="px-2 py-1 text-center font-heading font-bold">
+                              {score}
+                            </td>
+                          );
+                        })}
+
                       </tr>
                     </thead>
                     <tbody>
