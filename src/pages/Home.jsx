@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { motion } from 'framer-motion';
 import DecadeCard from "@/components/quiz/DecadeCard";
 import { userHasPack, userHasAnyPaidPack } from "@/lib/purchases";
@@ -6,6 +7,30 @@ import logoFull from "../assets/vinyl_logo_invert.png";
 
 export default function Home() {
   const navigate = useNavigate();
+
+  // NEW: Setting state
+  const [showCorrectOnWrong, setShowCorrectOnWrong] = useState(true);
+
+  // Load saved setting
+  useEffect(() => {
+    const saved = localStorage.getItem("showCorrectOnWrong");
+    if (saved !== null) setShowCorrectOnWrong(saved === "true");
+  }, []);
+
+  // Toggle handler
+  function toggleSetting() {
+    const newValue = !showCorrectOnWrong;
+    setShowCorrectOnWrong(newValue);
+    localStorage.setItem("showCorrectOnWrong", newValue);
+  };
+
+  const handleSelect = (decade) => {
+  navigate("/difficulty", {
+    state: { decade,
+            showCorrectOnWrong   // NEW: pass setting forward
+    },  
+  });
+  };
 
   const decades = [
     "1950s",
@@ -34,6 +59,25 @@ export default function Home() {
           Test your knowledge of the UK charts. Choose your decade to begin.
         </p>
       </div>
+      {/* NEW: Toggle Switch */}
+        <div className="flex items-center justify-center gap-3 mt-6">
+          <span className="text-xs text-muted-foreground">
+            Show Correct Answer When Wrong
+          </span>
+
+          <button
+            onClick={toggleSetting}
+            className={`w-12 h-6 rounded-full transition relative ${
+              showCorrectOnWrong ? "bg-primary" : "bg-muted"
+            }`}
+          >
+            <div
+              className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition ${
+                showCorrectOnWrong ? "left-6" : "left-0.5"
+              }`}
+            />
+          </button>
+        </div>
 
       {/* FREE PACK */}
       <DecadeCard
@@ -42,7 +86,7 @@ export default function Home() {
         emoji="🎁"
         locked={false}
         onSelect={() =>
-          navigate("/difficulty", { state: { decade: "free" } })
+          navigate("/difficulty", { state: { decade: "free", showCorrectOnWrong } })
         }
       />
 
@@ -56,7 +100,7 @@ export default function Home() {
           locked={!userHasPack(d)}
           onSelect={() => {
             if (!userHasPack(d)) return alert(`Purchase ${d} pack`);
-            navigate("/difficulty", { state: { decade: d } });
+            navigate("/difficulty", { state: { decade: d, showCorrectOnWrong } });
           }}
         />
       ))}
@@ -69,46 +113,45 @@ export default function Home() {
         locked={!userHasAnyPaidPack()}
         onSelect={() => {
           if (!userHasAnyPaidPack()) return alert("Purchase more packs");
-          navigate("/difficulty", { state: { decade: "all" } });
+          navigate("/difficulty", { state: { decade: "all", showCorrectOnWrong } });
         }}
       />
 
       <div className="flex flex-col items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1 }}
+          className="flex gap-5 mt-3"
+        >
+          <button
+            onClick={() => navigate('/highscores')}
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            High Scores
+          </button>
+          <button
+            onClick={() => navigate('/how-to-play')}
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            How to Play
+          </button>
+          <button
+            onClick={() => navigate('/about')}
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            About
+          </button>
+        </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1 }}
-        className="flex gap-5 mt-3"
-      >
-        <button
-          onClick={() => navigate('/highscores')}
-          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="text-xs text-muted-foreground mt-3"
         >
-          High Scores
-        </button>
-        <button
-          onClick={() => navigate('/how-to-play')}
-          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-        >
-          How to Play
-        </button>
-        <button
-          onClick={() => navigate('/about')}
-          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-        >
-          About
-        </button>
-      </motion.div>
-
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.8 }}
-        className="text-xs text-muted-foreground mt-3"
-      >
-        No internet required • No ads
-      </motion.p>
+          No internet required • No ads
+        </motion.p>
       </div>
 
     </div>

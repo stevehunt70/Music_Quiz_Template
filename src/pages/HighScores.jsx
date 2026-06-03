@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Star, TrendingUp, Music, Disc3, Flame, Trophy } from "lucide-react";
+import { Star, TrendingUp, Music, Disc3, Flame } from "lucide-react";
 import { getHighScore } from "@/lib/quizStorage";
 import { getDropdownDecades } from "@/lib/purchases";
 import logoFull from "../assets/vinyl_logo_invert.png";
@@ -130,7 +130,7 @@ export default function HighScores() {
 
                           return (
                             <td key={qc} className="px-2 py-1 text-center font-heading font-bold">
-                              {score}
+                              Q{qc}
                             </td>
                           );
                         })}
