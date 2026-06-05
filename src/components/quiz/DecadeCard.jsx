@@ -5,8 +5,9 @@ export default function DecadeCard({
   label, 
   emoji, 
   locked = false, 
-  onSelect, 
-  index 
+  onSelect,
+  index, 
+  description 
 }) {
   return (
     <motion.button
@@ -31,24 +32,29 @@ export default function DecadeCard({
 
       <div className="flex-1">
         <p className="font-heading font-bold text-foreground">{label}</p>
+          {/* Always show the decade description */}
+          <p className="text-xs text-muted-foreground">
+            {description}
+          </p>
 
-        {locked ? (
-          <p className="text-xs text-muted-foreground">
-            Tap to unlock this decade
-          </p>
-        ) : (
-          <p className="text-xs text-muted-foreground">
-            UK Chart Questions
-          </p>
-        )}
+          {/* Only show purchase message when locked */}
+          {locked && (
+            <p className="text-xs text-primary mt-1">
+              Tap to purchase this decade
+            </p>
+          )}
       </div>
 
-      <div className={`
-        transition-colors 
-        ${locked ? "text-muted-foreground" : "text-muted-foreground group-hover:text-primary"}
-      `}>
-        {locked ? "🔒" : "→"}
+
+      <div
+        className={`
+          transition-colors 
+          ${locked ? "text-muted-foreground" : "text-muted-foreground group-hover:text-primary"}
+          `}
+        >
+          {locked ? "🔒" : "→"}
       </div>
+
     </motion.button>
   );
 }

@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion } from 'framer-motion';
 import DecadeCard from "@/components/quiz/DecadeCard";
-import { userHasPack, userHasAnyPaidPack } from "@/lib/purchases";
+import { userHasPack, userHasAllDecades } from "@/lib/purchases";
 import logoFull from "../assets/vinyl_logo_invert.png";
 
 export default function Home() {
@@ -42,6 +42,46 @@ export default function Home() {
     "2010s"
   ];
 
+  const decadeMeta = {
+    free: {
+      emoji: "🎁",
+      description: "A mix of hits across all decades"
+    },
+    "1950s": {
+      emoji: "🎙️",
+      description: "Rock ’n’ roll, doo‑wop, and early pop classics"
+    },
+    "1960s": {
+      emoji: "🎸",
+      description: "British Invasion, Motown, and psychedelic rock"
+    },
+    "1970s": {
+      emoji: "🕺",
+      description: "Disco, funk, soft rock, and early punk"
+    },
+    "1980s": {
+      emoji: "🎹",
+      description: "Synth‑pop, new wave, and power ballads"
+    },
+    "1990s": {
+      emoji: "🎧",
+      description: "Grunge, Britpop, R&B, and dance anthems"
+    },
+    "2000s": {
+      emoji: "📀",
+      description: "Pop‑punk, R&B, hip‑hop, and club hits"
+    },
+    "2010s": {
+      emoji: "🎤",
+      description: "EDM, trap, indie pop, and global chart‑toppers"
+    },
+    all: {
+      emoji: "🌍",
+      description: "Every decade combined into one mega‑quiz"
+    }
+  };
+
+
   return (
     <div className="grid gap-4 px-5 py-8 max-w-xl mx-auto">
 
@@ -60,7 +100,7 @@ export default function Home() {
         </p>
       </div>
       {/* NEW: Toggle Switch */}
-        <div className="flex items-center justify-center gap-3 mt-6">
+        <div className="flex items-center justify-center gap-3">
           <span className="text-xs text-muted-foreground">
             Show Correct Answer When Wrong
           </span>
@@ -83,7 +123,8 @@ export default function Home() {
       <DecadeCard
         decade="free"
         label="Free Pack"
-        emoji="🎁"
+        emoji={decadeMeta.free.emoji}
+        description={decadeMeta.free.description}
         locked={false}
         onSelect={() =>
           navigate("/difficulty", { state: { decade: "free", showCorrectOnWrong } })
@@ -96,7 +137,8 @@ export default function Home() {
           key={d}
           decade={d}
           label={d}
-          emoji="🎵"
+          emoji={decadeMeta[d].emoji}
+          description={decadeMeta[d].description}
           locked={!userHasPack(d)}
           onSelect={() => {
             if (!userHasPack(d)) return alert(`Purchase ${d} pack`);
@@ -105,14 +147,15 @@ export default function Home() {
         />
       ))}
 
+
       {/* ALL DECADES */}
       <DecadeCard
         decade="all"
         label="All Decades"
         emoji="🌍"
-        locked={!userHasAnyPaidPack()}
+        locked={!userHasAllDecades()}
         onSelect={() => {
-          if (!userHasAnyPaidPack()) return alert("Purchase more packs");
+          if (!userHasAllDecades()) return alert("Purchase more packs");
           navigate("/difficulty", { state: { decade: "all", showCorrectOnWrong } });
         }}
       />

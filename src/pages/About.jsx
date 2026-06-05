@@ -16,13 +16,13 @@ export default function About() {
       >
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm mb-8"
+          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm mb-4"
         >
           <ArrowLeft className="w-4 h-4" />
           Back
         </button>
 
-        <div className="text-center mb-8">
+        <div className="text-center mb-4">
           
           <h1 className="text-3xl font-heading font-bold tracking-tight mb-2">About</h1>
           <p className="text-muted-foreground text-sm">UK Chart Music Quiz</p>
@@ -33,7 +33,7 @@ export default function About() {
             <p className="font-heading font-semibold text-foreground text-sm mb-1">What is this?</p>
             <p className="text-muted-foreground text-xs leading-relaxed">
               A music trivia game focused on the UK singles chart. Test your knowledge of the hits that defined each decade, from the 1950s through to the 2010s.
-              There are currently over 37000 questions in the app, with more being added and other subjects to follow.
+              There are currently over 35000 questions in the app, with more being added and other subjects to follow.
             </p>
           </div>
 
@@ -45,9 +45,19 @@ export default function About() {
           </div>
 
           <div className="p-4 rounded-xl border border-border/50 bg-card">
+            <p className="font-heading font-semibold text-foreground text-sm mb-1">Prices</p>
+            <p className="text-muted-foreground text-xs leading-relaxed">
+              You have 200 questions in the free area which span all of the decades. You can then purchase additional decades for £0.99 each, or get them all for £4.99.
+            </p>
+            <p className="text-muted-foreground text-xs leading-relaxed">
+              Your purchase helps support the development of the app and future updates.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl border border-border/50 bg-card">
             <p className="font-heading font-semibold text-foreground text-sm mb-1">No internet required</p>
             <p className="text-muted-foreground text-xs leading-relaxed">
-              All questions are built into the app. No ads, no tracking, no accounts needed. Just pure music trivia.
+              All questions are built into the app. No ads, no tracking, no accounts needed. Just pure music trivia. The only connection you need is if you decide to purchase more decades.
             </p>
           </div>
         </div>

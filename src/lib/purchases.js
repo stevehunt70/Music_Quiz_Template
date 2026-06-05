@@ -3,11 +3,11 @@
 export const entitlements = {
   //free_pack: { isActive: true },
   "1950s_pack": { isActive: false },
-  "1960s_pack": { isActive: false },
-  "1970s_pack": { isActive: false },
+  "1960s_pack": { isActive: true },
+  "1970s_pack": { isActive: true },
   "1980s_pack": { isActive: true },
-  "1990s_pack": { isActive: false },
-  "2000s_pack": { isActive: true },
+  "1990s_pack": { isActive: true },
+  "2000s_pack": { isActive: false },
   "2010s_pack": { isActive: false },
   "all_decades": { isActive: false }
 };
@@ -20,11 +20,17 @@ export function userHasPack(decade) {
 }
 
 // Check if user owns enough packs to unlock "All Decades"
-export function userHasAnyPaidPack() {
-  const owned = Object.keys(entitlements)
-    .filter((e) => entitlements[e].isActive && e !== "free_pack");
+export function userHasAllDecades() {
+  // If purchased directly
+  if (entitlements["all_decades"]?.isActive) return true;
 
-  return owned.length >= 5 || entitlements["all_decades"]?.isActive;
+  // Count purchased decade packs (excluding free)
+  const purchasedDecades = Object.keys(entitlements)
+    .filter((key) => key.endsWith("_pack") && key !== "free_pack")
+    .filter((key) => entitlements[key].isActive);
+
+  // Unlock automatically if 5 or more decades purchased
+  return purchasedDecades.length >= 5;
 }
 
 // Returns ALL decades the user owns (including free)
@@ -46,7 +52,7 @@ export function getDropdownDecades() {
   const owned = getOwnedDecades();
 
   // Add "all" only if user has enough packs
-  if (owned.length >= 5 || entitlements["all_decades"]?.isActive) {
+  if (userHasAllDecades()) {
     owned.push("all");
   }
 

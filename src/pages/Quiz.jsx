@@ -6,6 +6,8 @@ import AnswerButton from "@/components/quiz/AnswerButton";
 import { generateQuestion, buildMultipleChoice } from "@/lib/questionGenerator";
 import { shuffleArray } from "@/lib/shuffleArray";
 
+import { getOwnedDecades } from "@/lib/purchases";
+
 export default function Quiz() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -27,7 +29,7 @@ export default function Quiz() {
 
       // ALL DECADES MODE
       if (decade === "all") {
-        const packs = getPurchasedDecades(); // ["free","1970s","1980s"]
+        const packs = getOwnedDecades(); // ["free","1970s","1980s"]
         for (const p of packs) {
           const data = await import(`../data/songs${p}.json`);
           dataset = dataset.concat(data.default);
