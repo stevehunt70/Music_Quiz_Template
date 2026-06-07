@@ -11,6 +11,8 @@ export default function Difficulty() {
   const [difficulty, setDifficulty] = useState(1);
   const [questionCount, setQuestionCount] = useState(10);
 
+  const questionCounts = [5, 10, 15, 20, 25, 30, "unlimited"];
+
   function startQuiz() {
     navigate("/quiz", {
       state: {
@@ -49,12 +51,12 @@ export default function Difficulty() {
         <label className="text-xs text-muted-foreground">Number of Questions</label>
         <select
           value={questionCount}
-          onChange={(e) => setQuestionCount(Number(e.target.value))}
+          onChange={(e) => setQuestionCount(e.target.value)}
           className="w-full p-3 rounded-xl border bg-card"
         >
-          {[5, 10, 15, 20, 25, 30].map((n) => (
-            <option key={n} value={n}>
-              {n} Questions
+          {questionCounts.map((qc) => (
+            <option key={qc} value={qc}>
+              {qc === "unlimited" ? "Unlimited" : `${qc} Questions`}
             </option>
           ))}
         </select>

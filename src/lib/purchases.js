@@ -2,14 +2,14 @@
 // Later this will come from RevenueCat or Google/Apple billing.
 export const entitlements = {
   //free_pack: { isActive: true },
-  "1950s_pack": { isActive: false },
+  "1950s_pack": { isActive: true },
   "1960s_pack": { isActive: true },
   "1970s_pack": { isActive: true },
   "1980s_pack": { isActive: true },
   "1990s_pack": { isActive: true },
-  "2000s_pack": { isActive: false },
-  "2010s_pack": { isActive: false },
-  "all_decades": { isActive: false }
+  "2000s_pack": { isActive: true },
+  "2010s_pack": { isActive: true },
+  "all_decades": { isActive: true }
 };
 
 // Check if user owns a specific decade

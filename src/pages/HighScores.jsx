@@ -5,7 +5,7 @@ import { getHighScore } from "@/lib/quizStorage";
 import { getDropdownDecades } from "@/lib/purchases";
 import logoFull from "../assets/vinyl_logo_invert.png";
 
-const questionCounts = [5, 10, 15, 20, 25, 30];
+const questionCounts = [5, 10, 15, 20, 25, 30, "Unlimited"];
 const difficulties = [1, 2, 3, 4, 5];
 
 const difficultyConfig = {
@@ -126,11 +126,12 @@ export default function HighScores() {
                     <thead>
                       <tr className="text-muted-foreground text-xs">
                         {questionCounts.map((qc) => {
-                          const score = getHighScore(decade, String(diff), String(qc)) || 0;
+                          const key = qc === "unlimited" ? "unlimited" : qc;
+                          const score = getHighScore(decade, diff, key) || 0;
 
                           return (
                             <td key={qc} className="px-2 py-1 text-center font-heading font-bold">
-                              Q{qc}
+                              {qc === "Unlimited" ? "∞" : `Q${qc}`}
                             </td>
                           );
                         })}

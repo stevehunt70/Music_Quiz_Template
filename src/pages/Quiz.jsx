@@ -20,6 +20,8 @@ export default function Quiz() {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const isUnlimited = questionCount === "unlimited";
+
   useEffect(() => {
   async function loadData() {
     try {
@@ -48,7 +50,9 @@ export default function Quiz() {
       );
 
       // PICK QUESTIONS
-      const selected = shuffleArray(filtered).slice(0, questionCount);
+      const selected = isUnlimited
+        ? shuffleArray(filtered)            // take ALL filtered songs
+        : shuffleArray(filtered).slice(0, Number(questionCount));
 
       const generated = selected
         .map((entry) => {
@@ -79,23 +83,36 @@ export default function Quiz() {
   const currentQ = questions[current];
 
   function handleSelect(index) {
-  if (selectedIndex !== null) return;
+    if (selectedIndex !== null) return;
 
-  setSelectedIndex(index);
+    setSelectedIndex(index);
 
-  const isCorrect = index === currentQ.correctIndex;
-  if (isCorrect) {
-    setScore((prev) => prev + 1);
-  }
+    const isCorrect = index === currentQ.correctIndex;
+    if (isCorrect) {
+      setScore((prev) => prev + 1);
+    }
 
-  setTimeout(() => {
-    if (current < questions.length - 1) {
-      setCurrent((prev) => prev + 1);
-      setSelectedIndex(null);
-    } else {
+    setTimeout(() => {
+      // UNLIMITED MODE: stop when dataset is exhausted
+      if (isUnlimited && current >= questions.length - 1) {
+        const finalScore = isCorrect ? score + 1 : score;
+
+        return navigate("/results", {
+          state: {
+            score: finalScore,
+            total: questions.length,
+            decade,
+            difficulty,
+            questionCount
+          }
+        });
+      }
+
+    // NORMAL MODE: stop when questionCount reached
+    if (!isUnlimited && current >= questions.length - 1) {
       const finalScore = isCorrect ? score + 1 : score;
 
-      navigate("/results", {
+      return navigate("/results", {
         state: {
           score: finalScore,
           total: questions.length,
@@ -105,6 +122,10 @@ export default function Quiz() {
         }
       });
     }
+
+    // Otherwise continue
+    setCurrent((prev) => prev + 1);
+    setSelectedIndex(null);
   }, 900);
 }
 

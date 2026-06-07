@@ -15,13 +15,17 @@ export default function Results() {
   const [prevHighScore, setPrevHighScore] = useState(0);
   const [isNewHighScore, setIsNewHighScore] = useState(false);
 
+  const isUnlimited = questionCount === "unlimited";
+
   useEffect(() => {
     if (!decade || !difficulty || !questionCount) return;
 
-    const previous = getHighScore(decade, difficulty, questionCount);
+    const key = isUnlimited ? "unlimited" : questionCount;
+
+    const previous = getHighScore(decade, difficulty, key);
     setPrevHighScore(previous);
 
-    const isNew = setHighScore(decade, difficulty, questionCount, score);
+    const isNew = setHighScore(decade, difficulty, key, score);
     setIsNewHighScore(isNew);
   }, [decade, difficulty, questionCount, score]);
 
@@ -37,7 +41,9 @@ export default function Results() {
 
       <div className="space-y-3 text-lg">
         <p className="text-muted-foreground">
-          <strong>{questionCount} questions selected</strong>
+          <strong>
+            {isUnlimited ? "Unlimited mode" : `${questionCount} questions selected`}
+          </strong>
         </p>
       </div>
 
@@ -54,7 +60,9 @@ export default function Results() {
 
           <div className="w-[110px] p-4 rounded-xl bg-card border border-border/50 text-center">
             <XCircle className="w-5 h-5 text-rose-400 mx-auto mb-2" />
-            <p className="text-xl font-heading font-bold">{questionCount - score}</p>
+            <p className="text-xl font-heading font-bold">
+              {isUnlimited ? "—" : questionCount - score}
+            </p>
             <p className="text-xs text-muted-foreground">Wrong</p>
           </div>
 
@@ -71,9 +79,12 @@ export default function Results() {
         <p className="text-green-600 font-bold">🎉 New High Score!</p>
       ) : (
         <p className="text-muted-foreground">
-          High Score: {prevHighScore} / {questionCount}
+          {isUnlimited
+            ? `High Score: ${prevHighScore} questions`
+            : `High Score: ${prevHighScore} / ${questionCount}`}
         </p>
       )}
+
 
       <div className="w-full max-w-[360px] flex flex-col gap-3 items-center">
         <button
