@@ -1,6 +1,8 @@
 // src/pages/Results.jsx
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import Confetti from "react-confetti";
+import ReactCanvasConfetti from "react-canvas-confetti";
 import { getHighScore, setHighScore } from "@/lib/quizStorage";
 import { XCircle, Target, Trophy } from "lucide-react";
 import { motion } from 'framer-motion';
@@ -10,12 +12,16 @@ export default function Results() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const [fireworks, setFireworks] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+
   const { score, decade, difficulty, questionCount } = location.state || {};
 
   const [prevHighScore, setPrevHighScore] = useState(0);
   const [isNewHighScore, setIsNewHighScore] = useState(false);
 
   const isUnlimited = questionCount === "unlimited";
+
 
   useEffect(() => {
     if (!decade || !difficulty || !questionCount) return;
@@ -27,9 +33,59 @@ export default function Results() {
 
     const isNew = setHighScore(decade, difficulty, key, score);
     setIsNewHighScore(isNew);
+
+    // 🎆 FIREWORKS for perfect score (always)
+    if (!isUnlimited && score === Number(questionCount)) {
+      setFireworks(true);
+    }
+    // 🎉 CONFETTI for new high score
+    if (isNew) {
+      setShowConfetti(true);
+    }    
   }, [decade, difficulty, questionCount, score]);
 
   return (
+    <>
+    {showConfetti && <Confetti />}
+
+    {fireworks && (
+      <ReactCanvasConfetti
+        style={{
+          position: "fixed",
+          pointerEvents: "none",
+          width: "100%",
+          height: "100%",
+          top: 0,
+          left: 0,
+        }}
+        refConfetti={(confetti) => {
+          if (!confetti) return;
+          const duration = 2000;
+          const end = Date.now() + duration;
+
+          (function frame() {
+            confetti({
+              particleCount: 5,
+              angle: 60,
+              spread: 55,
+              origin: { x: 0 },
+            });
+            confetti({
+              particleCount: 5,
+              angle: 120,
+              spread: 55,
+              origin: { x: 1 },
+            });
+
+            if (Date.now() < end) {
+              requestAnimationFrame(frame);
+            }
+          })();
+        }}
+      />
+    )}
+    
+
     <div className="min-h-screen flex flex-col items-center justify-start px-5 py-10 space-y-8">
       <div className="flex justify-center">
         <div className="flex items-center gap-4">
@@ -103,5 +159,6 @@ export default function Results() {
       </div>
 
     </div>
+    </>
   );
 }
