@@ -22,36 +22,75 @@ export default function Results() {
 
   const isUnlimited = questionCount === "unlimited";
 
-  // 🎆 REAL FIREWORKS FUNCTION (canvas-confetti)
-  function shootFireworks() {
-    const origin = { x: Math.random(), y: 1 };
+  // 🎇 CUSTOM PERFECT SCORE FIREWORK SHOW
+  function fireworkShow() {
+    const colors = [
+      "#ff0040",
+      "#ff8000",
+      "#ffff00",
+      "#00ff00",
+      "#00ffff",
+      "#0080ff",
+      "#ff00ff",
+    ];
 
-    // Launch streak
-    confetti({
-      particleCount: 1,
-      startVelocity: 80,
-      spread: 5,
-      ticks: 50,
-      gravity: -0.5,
-      origin,
-      colors: ["#ffffff"],
-    });
+    // Launch a single rocket trail
+    function launchRocket() {
+      const x = Math.random() * 0.8 + 0.1; // avoid edges
 
+      confetti({
+        particleCount: 1,
+        startVelocity: 60,
+        spread: 5,
+        ticks: 60,
+        gravity: -0.4,
+        origin: { x, y: 1 },
+        colors: ["#ffffff"],
+      });
+
+      return x;
+    }
+
+    // Explosion burst at the rocket's peak
+    function explode(x) {
+      const particleCount = 80;
+      const spread = 360;
+
+      confetti({
+        particleCount,
+        spread,
+        startVelocity: 50,
+        ticks: 200,
+        gravity: 0.9,
+        scalar: 1.2,
+        origin: { x, y: Math.random() * 0.4 + 0.1 },
+        colors: colors.sort(() => Math.random() - 0.5).slice(0, 3),
+      });
+    }
+
+    // Fire a single firework (trail + explosion)
+    function firework() {
+      const x = launchRocket();
+      setTimeout(() => explode(x), 500 + Math.random() * 300);
+    }
+
+    // Fire 5 fireworks in sequence
+    for (let i = 0; i < 5; i++) {
+      setTimeout(() => firework(), i * 600);
+    }
+
+    // Finale burst
     setTimeout(() => {
-      // Explosion
-      for (let i = 0; i < 20; i++) {
-        confetti({
-          particleCount: 10,
-          angle: i * 18,
-          spread: 45,
-          startVelocity: 50,
-          origin: { x: origin.x, y: 0.3 },
-          ticks: 200,
-          gravity: 0.8,
-          scalar: 1.2,
-        });
-      }
-    }, 500);
+      confetti({
+        particleCount: 300,
+        spread: 360,
+        startVelocity: 60,
+        ticks: 250,
+        gravity: 1,
+        origin: { x: 0.5, y: 0.3 },
+        colors,
+      });
+    }, 3500);
   }
 
   // Load high scores + trigger celebrations
@@ -80,7 +119,7 @@ export default function Results() {
   // Fire fireworks AFTER render
   useEffect(() => {
     if (fireworksPending) {
-      shootFireworks();
+      fireworkShow();
     }
   }, [fireworksPending]);
 
@@ -89,7 +128,7 @@ export default function Results() {
       {/* CONFETTI */}
       {showConfetti && <Confetti />}
 
-      {/* FIREWORKS CANVAS (required for canvas-confetti) */}
+      {/* FIREWORKS CANVAS */}
       <canvas
         id="fireworks-canvas"
         style={{
