@@ -8,7 +8,7 @@ const steps = [
   { emoji: '🎯', title: 'Pick a Difficulty', body: 'Levels 1 through to 5, level 1 being the easiest. 1 - Questions from the Top 10, 2 - from the Top 20, 3 - Top 30 , 4 - Top 40 and 5 - Top 75.' },
   { emoji: '❓', title: 'Answer the Questions', body: 'You\'ll be shown a question about a UK chart hit. Tap the answer you think is correct.' },
   { emoji: '✅', title: 'Get Instant Feedback', body: 'Green means correct, red means wrong. You select from the home page whether you see the correct answer or not.' },
-  { emoji: '🏆', title: 'Beat Your High Score', body: 'Your best score for each decade and difficulty is saved automatically.' },
+  { emoji: '🏆', title: 'Beat Your High Score', body: 'Your best score for each decade and difficulty is saved automatically. Confetti will celebrate a high score and fireworks celebrate getting all questions correct.' },
 ];
 
 export default function HowToPlay() {
