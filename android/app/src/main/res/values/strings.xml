@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">UK Chart Music Quiz</string>
+    <string name="title_activity_main">UK Chart Music Quiz</string>
+    <string name="package_name">uk.co.mathsattacks</string>
+    <string name="custom_url_scheme">uk.co.mathsattacks</string>
+</resources>

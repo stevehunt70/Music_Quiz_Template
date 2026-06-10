@@ -8,6 +8,25 @@ import logoFull from "../assets/vinyl_logo_invert.png";
 export default function Home() {
   const navigate = useNavigate();
 
+  function handleRestorePurchases() {
+    try {
+      const restored = JSON.parse(localStorage.getItem("entitlements"));
+
+      if (!restored) {
+        alert("No previous purchases found.");
+        return;
+      }
+
+      localStorage.setItem("entitlements", JSON.stringify(restored));
+
+      alert("Purchases restored successfully!");
+      window.location.reload();
+    } catch (err) {
+      console.error("Restore failed:", err);
+      alert("Unable to restore purchases.");
+    }
+  }
+
   // NEW: Setting state
   const [showCorrectOnWrong, setShowCorrectOnWrong] = useState(true);
 
@@ -80,7 +99,6 @@ export default function Home() {
       description: "Every decade combined into one mega‑quiz"
     }
   };
-
 
   return (
     <div className="grid gap-4 px-5 py-8 max-w-xl mx-auto">
@@ -160,6 +178,14 @@ export default function Home() {
         }}
       />
 
+      <button
+        onClick={handleRestorePurchases}
+        className="w-full py-3 rounded-xl border border-primary text-primary hover:bg-accent"
+      >
+        Restore Purchases
+      </button>
+
+
       <div className="flex flex-col items-center justify-center">
         <motion.div
           initial={{ opacity: 0 }}
@@ -193,7 +219,7 @@ export default function Home() {
           transition={{ delay: 0.8 }}
           className="text-xs text-muted-foreground mt-3"
         >
-          No internet required • No ads
+          Internet required only when purchasing packs • No ads
         </motion.p>
       </div>
 
