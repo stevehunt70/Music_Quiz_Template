@@ -4,14 +4,14 @@
 
 // Default state for a brand‑new user
 const defaultEntitlements = {
-  "1950s_pack": false,
-  "1960s_pack": false,
-  "1970s_pack": false,
-  "1980s_pack": false,
-  "1990s_pack": false,
-  "2000s_pack": false,
-  "2010s_pack": false,
-  "all_decades": false
+  "1950s_pack": true,
+  "1960s_pack": true,
+  "1970s_pack": true,
+  "1980s_pack": true,
+  "1990s_pack": true,
+  "2000s_pack": true,
+  "2010s_pack": true,
+  "all_decades": true
 };
 
 // Load entitlements from localStorage OR fallback to defaults

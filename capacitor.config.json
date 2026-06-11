@@ -1,0 +1,11 @@
+{
+  "appId": "com.your.app",
+  "appName": "UK Chart Music Quiz",
+  "webDir": "dist",
+  "assets": {
+    "path": "public",
+    "icon": {
+      "source": "icon.png"
+    }
+  }
+}
