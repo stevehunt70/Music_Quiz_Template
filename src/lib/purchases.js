@@ -1,23 +1,38 @@
 // ---------------------------------------------
-// Persistent Entitlements System
+// Product ID Mapping (Google Play / RevenueCat)
 // ---------------------------------------------
-
-// Default state for a brand‑new user
-const defaultEntitlements = {
-  "1950s_pack": true,
-  "1960s_pack": true,
-  "1970s_pack": true,
-  "1980s_pack": true,
-  "1990s_pack": true,
-  "2000s_pack": true,
-  "2010s_pack": true,
-  "all_decades": true
+export const decadeToProductId = {
+  "1950s": "1950sdecade",
+  "1960s": "1960sdecade",
+  "1970s": "1970sdecade",
+  "1980s": "1980sdecade",
+  "1990s": "1990sdecade",
+  "2000s": "2000sdecade",
+  "2010s": "2010sdecade",
+  "all": "alldecadesbundle"
 };
 
-// Load entitlements from localStorage OR fallback to defaults
+// ---------------------------------------------
+// Default entitlements (set to true for testing)
+// ---------------------------------------------
+const defaultEntitlements = {
+  "1950sdecade": true,
+  "1960sdecade": true,
+  "1970sdecade": true,
+  "1980sdecade": true,
+  "1990sdecade": true,
+  "2000sdecade": true,
+  "2010sdecade": true,
+  "alldecadesbundle": true
+};
+
+// ---------------------------------------------
+// Load & Save
+// ---------------------------------------------
 export function loadEntitlements() {
   const saved = localStorage.getItem("entitlements");
   if (!saved) return { ...defaultEntitlements };
+
   try {
     return { ...defaultEntitlements, ...JSON.parse(saved) };
   } catch {
@@ -25,34 +40,36 @@ export function loadEntitlements() {
   }
 }
 
-// Save entitlements to localStorage
 export function saveEntitlements(entitlements) {
   localStorage.setItem("entitlements", JSON.stringify(entitlements));
 }
 
-// Global entitlements object (always loaded fresh)
+// Global entitlements object
 export let entitlements = loadEntitlements();
 
 // ---------------------------------------------
-// Unlock a pack (used after purchase)
+// Unlock a single decade (after purchase)
 // ---------------------------------------------
 export function unlockPack(decade) {
-  const key = `${decade}_pack`;
-  entitlements[key] = true;
-  saveEntitlements(entitlements);
-}
+  const productId = decadeToProductId[decade];
+  if (!productId) return;
 
-// Unlock All Decades directly
-export function unlockAllDecades() {
-  entitlements["all_decades"] = true;
+  entitlements[productId] = true;
   saveEntitlements(entitlements);
 }
 
 // ---------------------------------------------
-// Restore Purchases (Home.jsx calls this)
+// Unlock All Decades (after bundle purchase)
+// ---------------------------------------------
+export function unlockAllDecades() {
+  entitlements["alldecadesbundle"] = true;
+  saveEntitlements(entitlements);
+}
+
+// ---------------------------------------------
+// Restore Purchases (from Google / RevenueCat)
 // ---------------------------------------------
 export function restorePurchases(restoredEntitlements) {
-  // Merge restored entitlements with defaults
   entitlements = { ...defaultEntitlements, ...restoredEntitlements };
   saveEntitlements(entitlements);
 }
@@ -63,34 +80,30 @@ export function restorePurchases(restoredEntitlements) {
 export function userHasPack(decade) {
   if (decade === "free") return true;
 
-  // If All Decades is purchased, everything is unlocked
-  if (entitlements["all_decades"]) return true;
+  // If bundle is owned, everything is unlocked
+  if (entitlements["alldecadesbundle"]) return true;
 
-  return entitlements[`${decade}_pack`] === true;
+  const productId = decadeToProductId[decade];
+  return entitlements[productId] === true;
 }
 
 // ---------------------------------------------
-// Check if user owns enough packs to unlock All Decades
+// Check if user owns All Decades
 // ---------------------------------------------
 export function userHasAllDecades() {
-  if (entitlements["all_decades"]) return true;
-
-  const purchasedDecades = Object.keys(entitlements)
-    .filter((key) => key.endsWith("_pack"))
-    .filter((key) => entitlements[key] === true);
-
-  return purchasedDecades.length >= 5;
+  return entitlements["alldecadesbundle"] === true;
 }
 
 // ---------------------------------------------
-// Get list of owned decades (for dropdowns)
+// Get list of owned decades
 // ---------------------------------------------
 export function getOwnedDecades() {
   const owned = ["free"];
 
-  for (const key in entitlements) {
-    if (key.endsWith("_pack") && entitlements[key] === true) {
-      owned.push(key.replace("_pack", ""));
+  for (const decade in decadeToProductId) {
+    const productId = decadeToProductId[decade];
+    if (entitlements[productId]) {
+      owned.push(decade);
     }
   }
 
